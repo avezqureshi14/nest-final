@@ -11,10 +11,24 @@ export class OtpDbRepository {
         });
     }
 
+
     async updateOtp(email: string, otp: string) {
         return this.prisma.user.update({
             where: { email },
-            data: { otp },
+            data: {
+                otp,
+                otpGeneratedAt: new Date(),
+            },
+        });
+    }
+
+    async findOtpDetails(email: string) {
+        return this.prisma.user.findUnique({
+            where: { email },
+            select: {
+                otp: true,
+                otpGeneratedAt: true,
+            },
         });
     }
 }

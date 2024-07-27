@@ -1,12 +1,12 @@
-// auth.service.ts
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { AuthDbService } from '../db/auth/auth-db.service';
 import { AuthDto } from './dto/auth.dto';
 import { hashPassword, comparePasswords, signToken } from './helpers/auth.helpers';
 import { JwtService } from '@nestjs/jwt';
-import { ResponseUtil } from './helpers/response.util';
+import { ResponseUtil } from '../common/response.util';
 import { ForgotPasswordDto } from './dto/forget-password.dto';
 import { OtpService } from '../otp/otp.service';
+import { ResetPasswordDto } from './dto/reset-password.dto'; // Import the DTO for password reset
 
 @Injectable()
 export class AuthService {
@@ -63,4 +63,17 @@ export class AuthService {
     return ResponseUtil.success(null, 'OTP sent successfully');
   }
 
+  async resetPassword(email: string, otp: string, resetPasswordDto: ResetPasswordDto): Promise<any> {
+    // Validate OTP
+    const valid = await this.otpService.validateOtp(email, otp);
+
+    // Update user password
+    const { newPassword } = resetPasswordDto;
+    const hashedPassword = await hashPassword(newPassword);
+    if (valid) {
+      console.log("Passed Validation")
+      await this.authDbService.updatePassword(email, hashedPassword);
+    }
+    return ResponseUtil.success(null, 'Password reset successfully');
+  }
 }

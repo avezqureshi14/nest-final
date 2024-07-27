@@ -25,3 +25,4 @@ export async function sendOtpEmail(mailService: any, email: string, otp: string)
         throw new InternalServerErrorException(ResponseUtil.error('Failed to send OTP email', 500));
     }
 }
+

@@ -1,17 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AuthDbRepository } from './auth-db.repository';
-import { AuthDto } from '../../auth/dto/auth.dto';
 
 @Injectable()
 export class AuthDbService {
     constructor(private authDbRepository: AuthDbRepository) { }
 
     async findUserByEmail(email: string) {
-        return await this.authDbRepository.findUserByEmail(email);
+        try {
+            const user = await this.authDbRepository.findUserByEmail(email);
+            return user || null;
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to find user by email');
+        }
     }
+
+
 
     async createUser(email: string, password: string) {
-        return await this.authDbRepository.createUser(email, password);
+        try {
+            return await this.authDbRepository.createUser(email, password);
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to create user');
+        }
     }
 
+    async updatePassword(email: string, newPassword: string) {
+        try {
+            return await this.authDbRepository.updatePassword(email, newPassword);
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to update password');
+        }
+    }
 }

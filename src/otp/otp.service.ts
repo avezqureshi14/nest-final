@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ResponseUtil } from '../auth/helpers/response.util';
+import { ResponseUtil } from '../common/response.util';
 import { OtpDbService } from '../db/otp/otp-db.service';
 import { MailService } from '../mail/mail.service';
-import { generateOtp, storeOtp, sendOtpEmail } from './helpers/helpers'; // Import helper functions
+import { generateOtp, storeOtp, sendOtpEmail } from './helpers/helpers';
 
 @Injectable()
 export class OtpService {
@@ -21,5 +21,9 @@ export class OtpService {
         const otp = generateOtp();
         await storeOtp(this.otpDbService, email, otp);
         await sendOtpEmail(this.mailService, email, otp);
+    }
+
+    async validateOtp(email: string, otp: string): Promise<boolean> {
+        return this.otpDbService.validateOtp(email, otp);
     }
 }

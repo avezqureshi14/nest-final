@@ -6,14 +6,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:pass123@localhost:5432/authentication"
+  url      = "postgresql://postgres:pass123@127.0.0.1:5432/postgres"
+  // url      = "postgresql://postgres:pass123@localhost:5432/authentication/"
 }
 
 model User {
-  id    String  @unique @default(uuid()) 
-  email String  @unique
-  password String 
-  createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt()
-  otp      String?
+  id              String   @unique @default(uuid())
+  email           String   @unique
+  password        String
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt()
+  otp             String?
+  otpGeneratedAt  DateTime? // Add this field to track OTP generation 
 }
+

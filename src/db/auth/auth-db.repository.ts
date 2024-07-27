@@ -6,6 +6,7 @@ export class AuthDbRepository {
     constructor(private prisma: PrismaService) { }
 
     async findUserByEmail(email: string) {
+        console.log(email);
         return await this.prisma.user.findUnique({ where: { email } });
     }
 
@@ -15,4 +16,11 @@ export class AuthDbRepository {
         });
     }
 
+    async updatePassword(email: string, newPassword: string) {
+        const updatedUser = await this.prisma.user.update({
+            where: { email },
+            data: { password: newPassword },
+        });
+        return updatedUser;
+    }
 }
