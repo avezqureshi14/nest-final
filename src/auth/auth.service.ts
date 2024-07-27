@@ -1,24 +1,20 @@
+// auth.service.ts
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { AuthDbService } from '../db/auth/auth-db.service';
-import { OtpService } from '../otp/otp.service';
 import { AuthDto } from './dto/auth.dto';
 import { hashPassword, comparePasswords, signToken } from './helpers/auth.helpers';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseUtil } from './helpers/response.util';
 import { ForgotPasswordDto } from './dto/forget-password.dto';
-import { PrismaService } from 'prisma/prisma.service';
-import * as sgMail from '@sendgrid/mail';
+import { OtpService } from '../otp/otp.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private authDbService: AuthDbService,
     private jwt: JwtService,
-    private prisma: PrismaService,
-    private otpService: OtpService
-  ) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  }
+    private otpService: OtpService,
+  ) { }
 
   async signup(dto: AuthDto) {
     const { email, password } = dto;
@@ -62,8 +58,9 @@ export class AuthService {
     return ResponseUtil.success({ token }, 'Logged in successfully');
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
-    const { email } = forgotPasswordDto;
-    await this.otpService.sendOtp(email);
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<any> {
+    await this.otpService.sendOtp(forgotPasswordDto.email);
+    return ResponseUtil.success(null, 'OTP sent successfully');
   }
+
 }
