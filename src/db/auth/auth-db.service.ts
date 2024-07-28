@@ -8,21 +8,22 @@ export class AuthDbService {
     async findUserByEmail(email: string) {
         try {
             const user = await this.authDbRepository.findUserByEmail(email);
-            return user || null;
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+            return user;
         } catch (error) {
             throw new InternalServerErrorException('Failed to find user by email');
         }
     }
 
-
-
-    async createUser(email: string, password: string) {
-        try {
-            return await this.authDbRepository.createUser(email, password);
-        } catch (error) {
-            throw new InternalServerErrorException('Failed to create user');
-        }
-    }
+    // async createUser(email: string, password: string) {
+    //     try {
+    //         return await this.authDbRepository.createUser(email, password);
+    //     } catch (error) {
+    //         throw new InternalServerErrorException('Failed to create user');
+    //     }
+    // }
 
     async updatePassword(email: string, newPassword: string) {
         try {

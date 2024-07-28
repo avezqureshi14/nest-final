@@ -6,17 +6,36 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:pass123@127.0.0.1:5432/postgres"
-  // url      = "postgresql://postgres:pass123@localhost:5432/authentication/"
+  url      = "postgresql://postgres:pass123@localhost:5432/authentication"
 }
 
 model User {
   id              String   @unique @default(uuid())
   email           String   @unique
+  name            String   
   password        String
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt()
   otp             String?
-  otpGeneratedAt  DateTime? // Add this field to track OTP generation 
+  otpGeneratedAt  DateTime? 
+
+  roleId         String   @db.Uuid
+  shiftId        String   @db.Uuid
+
+  role           Role     @relation(fields: [roleId], references: [id])
+  shift          Shift    @relation(fields: [shiftId], references: [id])
 }
 
+model Shift {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @db.VarChar(255)
+  start_time DateTime
+  end_time   DateTime
+  users      User[]
+}
+
+model Role {
+  id   String   @id @default(uuid()) @db.Uuid
+  name String   @db.VarChar(255)
+  users User[]
+}

@@ -3,10 +3,11 @@ import { AuthDbService } from '../db/auth/auth-db.service';
 import { AuthDto } from './dto/auth.dto';
 import { hashPassword, comparePasswords, signToken } from './helpers/auth.helpers';
 import { JwtService } from '@nestjs/jwt';
-import { ResponseUtil } from '../common/response.util';
+import { ResponseUtil } from '../common/response/response.util';
 import { ForgotPasswordDto } from './dto/forget-password.dto';
 import { OtpService } from '../otp/otp.service';
 import { ResetPasswordDto } from './dto/reset-password.dto'; // Import the DTO for password reset
+import { MESSAGES } from 'src/common/response/response-messages';
 
 @Injectable()
 export class AuthService {
@@ -16,19 +17,19 @@ export class AuthService {
     private otpService: OtpService,
   ) { }
 
-  async signup(dto: AuthDto) {
-    const { email, password } = dto;
+  // async signup(dto: AuthDto) {
+  //   const { email, password } = dto;
 
-    const userExists = await this.authDbService.findUserByEmail(email);
-    if (userExists) {
-      throw new BadRequestException(ResponseUtil.error('Email already exists', 400));
-    }
+  //   const userExists = await this.authDbService.findUserByEmail(email);
+  //   if (userExists) {
+  //     throw new BadRequestException(ResponseUtil.error('Email already exists', 400));
+  //   }
 
-    const hashedPassword = await hashPassword(password);
-    await this.authDbService.createUser(email, hashedPassword);
+  //   const hashedPassword = await hashPassword(password);
+  //   await this.authDbService.createUser(email, hashedPassword);
 
-    return ResponseUtil.success(null, 'User created successfully');
-  }
+  //   return ResponseUtil.success(null, 'User created successfully');
+  // }
 
   async signin(dto: AuthDto) {
     const { email, password } = dto;
@@ -61,6 +62,13 @@ export class AuthService {
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<any> {
     await this.otpService.sendOtp(forgotPasswordDto.email);
     return ResponseUtil.success(null, 'OTP sent successfully');
+  }
+
+  async verifyOTP(email: string, otp: string): Promise<any> {
+    const valid = await this.otpService.validateOtp(email, otp);
+    if (valid) {
+      return ResponseUtil.success(null, MESSAGES.OTP.VALID);
+    }
   }
 
   async resetPassword(email: string, otp: string, resetPasswordDto: ResetPasswordDto): Promise<any> {

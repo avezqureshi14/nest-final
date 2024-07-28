@@ -1,8 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ResponseUtil } from '../common/response.util';
+import { ResponseUtil } from '../common/response/response.util';
 import { OtpDbService } from '../db/otp/otp-db.service';
 import { MailService } from '../mail/mail.service';
 import { generateOtp, storeOtp, sendOtpEmail } from './helpers/helpers';
+import { MESSAGES } from 'src/common/response/response-messages';
 
 @Injectable()
 export class OtpService {
@@ -15,7 +16,7 @@ export class OtpService {
         const user = await this.otpDbService.findUserByEmail(email);
 
         if (!user) {
-            throw new BadRequestException(ResponseUtil.error('User not found', 400));
+            throw new BadRequestException(ResponseUtil.error(MESSAGES.USER.NOT_FOUND, 400));
         }
 
         const otp = generateOtp();
@@ -24,6 +25,6 @@ export class OtpService {
     }
 
     async validateOtp(email: string, otp: string): Promise<boolean> {
-        return this.otpDbService.validateOtp(email, otp);
+        return await this.otpDbService.validateOtp(email, otp);
     }
 }

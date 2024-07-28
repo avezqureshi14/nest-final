@@ -1,5 +1,3 @@
-// src/auth/helpers/auth.helpers.ts
-
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { jwtSecret } from '../../utils/constants';
